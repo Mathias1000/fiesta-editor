@@ -32,6 +32,6 @@ Next, you can initialize a file like this:
         private void button2_Click(object sender, EventArgs e)
         {
             if (file != null)
-                file.Save(@"C:\Users\Chris\Desktop\Test.shn");
+                file.Save(@"C:\Users\XXXX\Desktop\Test.shn");
         }
 }}}
