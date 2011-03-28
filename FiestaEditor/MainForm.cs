@@ -103,10 +103,14 @@ namespace FiestaEditor
             TabPage page = (TabPage)menu.Tag;
             DataGridView view = (DataGridView)page.Controls[0];
             ((SHNFile)view.DataSource).Dispose();
+            view.Dispose();
             tabContainer.TabPages.Remove(page);
             if (tabContainer.TabCount == 0)
                 spltContainer.Panel2.Enabled = false;
             UpdateTabs();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         private void TabRight_Save_Click(object sender, EventArgs e)
