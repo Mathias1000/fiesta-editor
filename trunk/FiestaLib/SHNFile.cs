@@ -65,6 +65,7 @@ namespace FiestaLib
                 GenerateColumns(reader);
                 GenerateRows(reader);
             }
+            data = null;
         }
 
         public bool Save(string path)
@@ -178,6 +179,12 @@ namespace FiestaLib
             {
                 ((SHNColumn)base.Columns[i]).Write(writer);
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if(disposing) CryptHeader = null;
+            base.Dispose(disposing);
         }
 
         private void UpdateDefaultRecordLenght()
