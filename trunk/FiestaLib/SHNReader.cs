@@ -19,7 +19,7 @@ namespace FiestaLib
             string value = string.Empty;
             int offset = 0;
             byte[] buffer = base.ReadBytes(length);
-            while (buffer[offset] != 0x00 && offset < length) ++offset;
+            while( offset < length && buffer[offset] != 0x00 ) offset++;
             if (length > 0) value = SHNFile.Encoding.GetString(buffer, 0, offset);
             return value;
         }
