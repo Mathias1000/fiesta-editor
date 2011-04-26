@@ -128,7 +128,9 @@ namespace FiestaLib
         {
             foreach (DataRow row in base.Rows)
             {
-                writer.Write((short)0); //new row
+                int CurPos = (int)writer.BaseStream.Position;
+                short unkLength = 0;
+                writer.Write((short)0);     // Row Length
                 for (int colIndex = 0; colIndex < base.Columns.Count; ++colIndex)
                 {
                     SHNColumn column = (SHNColumn)base.Columns[colIndex];
@@ -165,11 +167,17 @@ namespace FiestaLib
                         case 22:
                             writer.Write((int)row[colIndex]);
                             break;
-                        case 26: //unk lenght
-                            writer.Write((string)row[colIndex]);
+                        case 26:
+                            string tmp = (string)row[colIndex];
+                            unkLength += (short)tmp.Length;
+                            writer.WritePaddedString(tmp, tmp.Length + 1);
                             break;
                     }
                 }
+                int LastPos = (int)writer.BaseStream.Position;
+                writer.Seek(CurPos, SeekOrigin.Begin);
+                writer.Write((short)(DefaultRecordLenght + unkLength));     // Update Row Length
+                writer.Seek(LastPos, SeekOrigin.Begin);
             }
         }
 
@@ -203,7 +211,7 @@ namespace FiestaLib
              object[] values = new object[this.ColumnCount];
              for (uint i = 0; i < RecordCount; ++i)
              {
-                 reader.ReadUInt16();
+                 uint RowLength = reader.ReadUInt16();
                  for (int j = 0; j < this.ColumnCount; ++j)
                  {
                      switch (((SHNColumn)this.Columns[j]).TypeByte)
@@ -239,8 +247,8 @@ namespace FiestaLib
                          case 22:
                              values[j] = reader.ReadInt32();
                              break;
-                         case 26: //unk lenght
-                             values[j] = reader.ReadString();
+                         case 26:       // TODO: Should be read until first null byte, to support more than 1 this kind of column
+                             values[j] = reader.ReadPaddedString((int)(RowLength - DefaultRecordLenght + 1));
                              break;
                          default:
                              throw new Exception("New column type found");
