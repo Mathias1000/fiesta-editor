@@ -71,7 +71,7 @@ namespace FiestaEditor
         {
             if (!File.Exists(path)) return null;
             Config conf;
-            using (FileStream file = File.Open(path, FileMode.Open))
+            using (FileStream file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 XmlSerializer ser = new XmlSerializer(typeof(Config));
                 conf = (Config)ser.Deserialize(file);

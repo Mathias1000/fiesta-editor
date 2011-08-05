@@ -28,6 +28,12 @@ namespace FiestaEditor
             cmbEncoding.Items.Add("UTF7");
             cmbEncoding.Items.Add("UTF8");
             cmbEncoding.SelectedIndex = cmbEncoding.FindString(Program.AppConfig.FileEncoding);
+            
+            string[] args = Environment.GetCommandLineArgs();
+            for(int i = 1; i < args.Length; i++)
+            {
+                OpenNewTab(args[i]);
+            }
         }
 
         public void SetStatus(string pText)
@@ -196,11 +202,13 @@ namespace FiestaEditor
 
         private void openToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            OpenFileDialog diag = new OpenFileDialog();
-            diag.Title = "Open SHN File";
-            diag.Filter = "Fiesta SHN File (*.shn)|*.shn";
-            if (diag.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
-            OpenNewTab(diag.FileName);
+            using (OpenFileDialog diag = new OpenFileDialog())
+            {
+                diag.Title = "Open SHN File";
+                diag.Filter = "Fiesta SHN File (*.shn)|*.shn";
+                if (diag.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+                OpenNewTab(diag.FileName);
+            }
         }
 
         private void saveToolStripMenuItem_Click_1(object sender, EventArgs e)
