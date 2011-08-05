@@ -47,23 +47,27 @@ namespace FiestaLib
             byte[] data;
             using (var file = File.Open(FileName, FileMode.Open))
             {
-                BinaryReader reader = new BinaryReader(file);
-                CryptHeader = reader.ReadBytes(32);
-                int lenght = reader.ReadInt32() - 36; //minus int + header
-                data = reader.ReadBytes(lenght);
-                Crypto.Crypt(data, 0, lenght);
-                //File.WriteAllBytes("Output.dat", data); //debug purpose
+                using (BinaryReader reader = new BinaryReader(file))
+                {
+                    CryptHeader = reader.ReadBytes(32);
+                    int lenght = reader.ReadInt32() - 36; //minus int + header
+                    data = reader.ReadBytes(lenght);
+                    Crypto.Crypt(data, 0, lenght);
+                    //File.WriteAllBytes("Output.dat", data); //debug purpose
+                }
             }
 
             using (var stream = new MemoryStream(data))
             {
-                SHNReader reader = new SHNReader(stream);
-                this.Header = reader.ReadUInt32();
-                this.RecordCount = reader.ReadUInt32();
-                this.DefaultRecordLenght = reader.ReadUInt32();
-                this.ColumnCount = reader.ReadUInt32();
-                GenerateColumns(reader);
-                GenerateRows(reader);
+                using (SHNReader reader = new SHNReader(stream))
+                {
+                    this.Header = reader.ReadUInt32();
+                    this.RecordCount = reader.ReadUInt32();
+                    this.DefaultRecordLenght = reader.ReadUInt32();
+                    this.ColumnCount = reader.ReadUInt32();
+                    GenerateColumns(reader);
+                    GenerateRows(reader);
+                }
             }
             data = null;
         }
@@ -87,25 +91,29 @@ namespace FiestaLib
                 byte[] content;
                 using (MemoryStream encrypted = new MemoryStream())
                 {
-                    SHNWriter writer = new SHNWriter(encrypted);
-                    writer.Write(this.Header);
-                    writer.Write((uint)this.Rows.Count);
-                    writer.Write(this.DefaultRecordLenght);
-                    writer.Write((uint)this.Columns.Count);
-                    WriteColumns(writer);
-                    WriteRows(writer);
-                    content = new byte[encrypted.Length];
-                    encrypted.Seek(0, SeekOrigin.Begin);
-                    encrypted.Read(content, 0, content.Length);
+                    using (SHNWriter writer = new SHNWriter(encrypted))
+                    {
+                        writer.Write(this.Header);
+                        writer.Write((uint)this.Rows.Count);
+                        writer.Write(this.DefaultRecordLenght);
+                        writer.Write((uint)this.Columns.Count);
+                        WriteColumns(writer);
+                        WriteRows(writer);
+                        content = new byte[encrypted.Length];
+                        encrypted.Seek(0, SeekOrigin.Begin);
+                        encrypted.Read(content, 0, content.Length);
+                    }
                 }
 
                 Crypto.Crypt(content, 0, content.Length);
                 using (FileStream final = File.Create(path))
                 {
-                    BinaryWriter writer = new BinaryWriter(final);
-                    writer.Write(CryptHeader);
-                    writer.Write((int)(content.Length + 36));
-                    writer.Write(content);
+                    using (BinaryWriter writer = new BinaryWriter(final))
+                    {
+                        writer.Write(CryptHeader);
+                        writer.Write((int)(content.Length + 36));
+                        writer.Write(content);
+                    }
                 }
 
                 this.FileName = path;

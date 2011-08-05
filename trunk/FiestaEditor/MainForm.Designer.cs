@@ -393,7 +393,7 @@
             this.Controls.Add(this.BottomStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
-            this.Text = "Fiesta Editor 2011 - RC1";
+            this.Text = "Fiesta Editor 2011 - RC2";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.spltContainer.Panel1.ResumeLayout(false);
             this.spltContainer.Panel2.ResumeLayout(false);
